@@ -1,0 +1,19 @@
+# Entornos virtuales
+venv/
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Credenciales y secretos
+.env*
+.aws/
+.streamlit/secrets.toml
+
+# Logs
+*.log
+
+# Sistema / editor
+.DS_Store
+.vscode/     
