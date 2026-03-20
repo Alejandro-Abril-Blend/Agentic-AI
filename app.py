@@ -9,14 +9,17 @@ st.set_page_config(
     layout="centered",
 )
 
-AWS_REGION = "us-east-1"
-AWS_PROFILE = "genai"  # 👈 Cambia esto por el nombre de tu perfil SSO
+A@st.cache_resource
+def get_bedrock_client():
+    return boto3.client(
+        service_name="bedrock-runtime",
+        region_name=os.getenv("AWS_REGION", "us-east-1"),
+        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+        aws_session_token=os.getenv("AWS_SESSION_TOKEN"),
+    )
 
-# Prueba en orden hasta que uno funcione:
-MODEL_ID = "us.anthropic.claude-3-5-sonnet-20241022-v2:0"  # Opción 1: Claude 3.5 Sonnet v2
-# MODEL_ID = "us.anthropic.claude-3-5-haiku-20241022-v1:0"   # Opción 2: Claude 3.5 Haiku
-# MODEL_ID = "us.anthropic.claude-3-haiku-20240307-v1:0"     # Opción 3: Claude 3 Haiku (más básico)
-
+MODEL_ID = os.getenv("MODEL_ID", "us.anthropic.claude-3-5-sonnet-20241022-v2:0")
 
 SYSTEM_PROMPT = (
     "Eres un experto certificado en AWS Cloud Practitioner. "
