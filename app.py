@@ -2,6 +2,9 @@ import os
 import json
 import boto3
 import streamlit as st
+from dotenv import load_dotenv
+
+load_dotenv()
 
 st.set_page_config(
     page_title="Asistente AWS Cloud Practitioner",
@@ -9,7 +12,7 @@ st.set_page_config(
     layout="centered",
 )
 
-A@st.cache_resource
+@st.cache_resource
 def get_bedrock_client():
     return boto3.client(
         service_name="bedrock-runtime",
@@ -25,7 +28,7 @@ SYSTEM_PROMPT = (
     "Eres un experto certificado en AWS Cloud Practitioner. "
     "Tu rol es ayudar a estudiantes a prepararse para el examen "
     "AWS Certified Cloud Practitioner (CLF-C02). "
-    "Responde siempre en español. "
+    "Responde siempre en espanol. "
     "Da explicaciones claras con ejemplos practicos. "
     "Si el usuario hace una pregunta tipo examen, evalua su respuesta "
     "y explica por que es correcta o incorrecta. "
@@ -33,14 +36,6 @@ SYSTEM_PROMPT = (
     "Temas: servicios AWS, modelo de responsabilidad compartida, "
     "facturacion, seguridad, arquitectura en la nube."
 )
-
-@st.cache_resource
-def get_bedrock_client():
-    session = boto3.Session(profile_name=AWS_PROFILE)
-    return session.client(
-        service_name="bedrock-runtime",
-        region_name=AWS_REGION,
-    )
 
 def invoke_bedrock(messages):
     client = get_bedrock_client()
@@ -60,7 +55,7 @@ def invoke_bedrock(messages):
     return result["content"][0]["text"]
 
 st.title("Asistente AWS Cloud Practitioner")
-st.caption("Preparacion CLF-C02 · Powered by Amazon Bedrock (Claude Sonnet 4-6)")
+st.caption("Preparacion CLF-C02 · Powered by Amazon Bedrock")
 
 if "messages" not in st.session_state:
     st.session_state.messages = [
@@ -83,7 +78,9 @@ for msg in st.session_state.messages:
         st.markdown(msg["content"])
 
 if prompt := st.chat_input("Escribe tu pregunta sobre AWS..."):
-    st.session_state.messages.append({"role": "user", "content": prompt})
+    st.session_state.messages.append(
+        {"role": "user", "content": prompt}
+    )
     with st.chat_message("user"):
         st.markdown(prompt)
 
@@ -92,6 +89,8 @@ if prompt := st.chat_input("Escribe tu pregunta sobre AWS..."):
             try:
                 reply = invoke_bedrock(st.session_state.messages)
                 st.markdown(reply)
-                st.session_state.messages.append({"role": "assistant", "content": reply})
+                st.session_state.messages.append(
+                    {"role": "assistant", "content": reply}
+                )
             except Exception as e:
                 st.error("Error al conectar con Bedrock: " + str(e))
